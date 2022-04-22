@@ -44,11 +44,22 @@ int main()
     std::cout << "constructing KDTree with " << npoints << " points." << std::endl;
 
     std::vector<point_t> points = getListofGeneratedVectors(npoints);
+	std::vector<point_t> points2 = getListofGeneratedVectors(npoints);
 
     auto start = std::chrono::high_resolution_clock::now();
     KDTree tree(points);
     auto stop = std::chrono::high_resolution_clock::now();
     auto timespan = std::chrono::duration<double>(stop - start);
+    std::cout << "it took " << timespan.count() << " seconds.";
+
+	start = std::chrono::high_resolution_clock::now();
+	for(const auto &point : points2)
+	{
+		tree.insert_point(point);
+	}
+
+    stop = std::chrono::high_resolution_clock::now();
+    timespan = std::chrono::duration<double>(stop - start);
     std::cout << "it took " << timespan.count() << " seconds.";
     return 0;
 }

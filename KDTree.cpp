@@ -21,7 +21,7 @@
 #include <memory>
 #include <vector>
 #include <numeric>
-
+#include <iostream>
 
 
 namespace {
@@ -144,7 +144,8 @@ KDNodePtr KDTree::make_tree(pointIndexArr::iterator begin,
 }
 
 KDTree::KDTree(const pointVec& point_array) 
-    : leaf{std::make_shared<KDNode>()}
+    : leaf{std::make_shared<KDNode>()}, 
+    array_size(point_array.size())
 {
     pointIndexArr arr;
     arr.reserve(point_array.size()); // allocating memory once
@@ -234,6 +235,50 @@ KDNodePtr KDTree::nearest_(const point_t &pt) {
                     root,          // best is the root
                     branch_dist);  // best_dist = branch_dist
 };
+
+void KDTree::insert_point(const point_t &pt) {
+    auto current = root;
+    auto level = level0;
+    auto dim = pt.size();
+
+    const auto current_size = array_size++;
+
+    if(!root)
+    {
+        root = std::make_shared<KDNode>(pt, current_size, NewKDNodePtr(), NewKDNodePtr());
+        return;
+    }
+
+    while(true)
+    {
+        if(pt[level] < current->x[level])
+        {
+            if(current->left->x.empty())
+            {
+                current->left = std::make_shared<KDNode>(pt, current_size, NewKDNodePtr(), NewKDNodePtr());
+                return;
+            }
+            else 
+            {
+                current = current->left;
+            }
+        }
+        else
+        {
+            if(current->right->x.empty())
+            {
+                current->right = std::make_shared<KDNode>(pt, current_size, NewKDNodePtr(), NewKDNodePtr());
+                return;
+            }
+            else 
+            {
+                current = current->right;
+            }
+        }
+
+        level = (level + 1) % dim;
+    }
+}
 
 point_t KDTree::nearest_point(const point_t &pt) {
     return point_t(*nearest_(pt));

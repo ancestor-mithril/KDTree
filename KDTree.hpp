@@ -78,6 +78,7 @@ inline void sort_on_idx(pointIndexArr::iterator,
 using pointVec = std::vector< point_t >;
 
 class KDTree {
+    size_t array_size;
     KDNodePtr root;
     KDNodePtr leaf;
 
@@ -104,6 +105,7 @@ class KDTree {
     KDNodePtr nearest_(const point_t &pt);
 
    public:
+    void insert_point(const point_t &pt);
     point_t nearest_point(const point_t &pt);
     size_t nearest_index(const point_t &pt);
     pointIndex nearest_pointIndex(const point_t &pt);

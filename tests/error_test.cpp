@@ -66,7 +66,12 @@ int main()
 			points = getListofGeneratedVectors(sizes);
 
 			// genereate KD Tree
-			KDTree tree(points);
+			KDTree tree;
+
+			for(const auto& point : points)
+			{
+				tree.insert_point(point);
+			}
 
 			// generate retrieve test data points
 			pointToRetrieve = getListofGeneratedVectors(sizes);
