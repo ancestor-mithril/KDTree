@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "KDTree.hpp"
+#include "../KDTree.hpp"
 
 // using point_t = std::vector< double >;
 // using pointVec = std::vector< point_t >;
