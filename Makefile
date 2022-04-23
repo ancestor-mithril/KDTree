@@ -11,7 +11,7 @@ all: builddir
 	cmake --build ./build
 
 FLAGS=-Wall -std=c++20 -Wextra -Wpedantic
-COMPILER=g++-11
+COMPILER=g++
 RELEASE=-O3 -DNDEBUG
 
 compile: builddir
