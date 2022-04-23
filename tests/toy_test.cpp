@@ -28,7 +28,7 @@ int main()
 
     std::cout << "nearest test\n";
     pt = {0.8, 0.2};
-    auto res = tree.nearest_point(pt);
+    auto res = tree.nearestPoint(pt);
     for (double b : res) {
         std::cout << b << " ";
     }
@@ -67,7 +67,8 @@ int main()
     pt = {.0, .5};
 
     */
-    auto res2 = tree.neighborhood_points(pt, .55);
+    // TODO: implement again this method
+    auto res2 = tree.neighborhoodPoints(pt, .55);
 
     for (point_t a : res2) {
         for (double b : a) {

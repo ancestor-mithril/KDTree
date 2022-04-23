@@ -53,7 +53,7 @@ int main()
 
     start = std::chrono::high_resolution_clock::now();
     for (const auto& point : points2) {
-        tree.insert_point(point);
+        tree.insertPoint(point);
     }
 
     stop = std::chrono::high_resolution_clock::now();
@@ -70,7 +70,7 @@ int main()
         start = std::chrono::high_resolution_clock::now();
 
         for (const auto& point : points3) {
-            auto nearest = tree.nearest_index(point);
+            auto nearest = tree.nearestIndex(point);
         }
 
         stop = std::chrono::high_resolution_clock::now();
@@ -82,12 +82,12 @@ int main()
     {
         KDTree tree;
         for (const auto& point : points2) {
-            tree.insert_point(point);
+            tree.insertPoint(point);
         }
 
         start = std::chrono::high_resolution_clock::now();
         for (const auto& point : points3) {
-            auto nearest = tree.nearest_index(point);
+            auto nearest = tree.nearestIndex(point);
         }
 
         stop = std::chrono::high_resolution_clock::now();
@@ -122,7 +122,7 @@ int main()
     {
         KDTree tree;
         for (const auto& point : points2) {
-            tree.insert_point(point);
+            tree.insertPoint(point);
         }
 
         start = std::chrono::high_resolution_clock::now();
@@ -148,7 +148,7 @@ int main()
     {
         KDTree tree;
         for (const auto& point : points2) {
-            tree.insert_point(point);
+            tree.insertPoint(point);
         }
 
         start = std::chrono::high_resolution_clock::now();

@@ -62,25 +62,26 @@ class KDTree
     KDTree() = default;
     explicit KDTree(const pointVec& point_array);
 
-    void insert_point(const point_t& pt);
-    const point_t& nearest_point(const point_t& pt) const;
-    size_t nearest_index(const point_t& pt) const;
-    pointIndex nearest_pointIndex(const point_t& pt) const;
+    void insertPoint(const point_t& pt);
+    void unsafeInsertPoint(const point_t& pt);
+    const point_t& nearestPoint(const point_t& pt) const;
+    size_t nearestIndex(const point_t& pt) const;
+    pointIndex nearestPointIndex(const point_t& pt) const;
 
     indexArr neighborhood(const point_t& pt, double rad) const;
 
     // TODO: Move vector of points here
     // add neighbor points
 
-    indexArr neighborhood_indices(const point_t& pt, double rad) const;
+    indexArr neighborhoodIndices(const point_t& pt, double rad) const;
 
     std::optional<std::size_t>
     firstNeighbor(const point_t& pt, double rad) const;
 
   private:
     KDNodePtr
-    make_tree(pointIndexArr::iterator begin, pointIndexArr::iterator end,
-              size_t length, size_t level);
+    makeTree(pointIndexArr::iterator begin, pointIndexArr::iterator end,
+             size_t length, size_t level);
 
     const KDNode*
     nearest_(const KDNode* branch, const point_t& pt, size_t level,

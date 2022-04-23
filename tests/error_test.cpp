@@ -69,7 +69,7 @@ int main()
             KDTree tree;
 
             for (const auto& point : points) {
-                tree.insert_point(point);
+                tree.insertPoint(point);
             }
 
             // generate retrieve test data points
@@ -88,7 +88,7 @@ int main()
                     }
                 }
                 std::vector<double> checkVec(DIM);
-                checkVec = tree.nearest_point(vals);
+                checkVec = tree.nearestPoint(vals);
                 if (std::equal(groundTruthVec.begin(), groundTruthVec.end(),
                                checkVec.begin())) {
                     correct += 1;
