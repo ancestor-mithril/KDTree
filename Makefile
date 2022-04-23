@@ -6,7 +6,7 @@ builddir:
 clean:
 	rm -rf ${BUILDDIR}
 
-all: builddir
+cmake: builddir
 	cmake -S . -B ./build
 	cmake --build ./build
 
@@ -15,8 +15,8 @@ COMPILER=g++
 RELEASE=-O3 -DNDEBUG
 
 compile: builddir
-	&& ${COMPILER} ${FLAGS} ${RELEASE} -c ../KDTree.cpp \
-	
+	cd ${BUILDDIR} \
+	&& ${COMPILER} ${FLAGS} ${RELEASE} -c ../KDTree.cpp
 
 error: compile
 	cd ${BUILDDIR} \
