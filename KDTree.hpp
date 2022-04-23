@@ -2,13 +2,15 @@
 
 /*
  * file: KDTree.hpp
- * author: J. Frederico Carvalho
+ * author: G. Stoica and S. Amihaesei
  *
- * This is an adaptation of the KD-tree implementation in rosetta code
- *  https://rosettacode.org/wiki/K-d_tree
- * It is a reimplementation of the C code using C++.
- * It also includes a few more queries than the original
- *
+ * Based on the implemetation from https://github.com/crvs/KDTree by J.
+ * Frederico Carvalho with elements from rosetta code from
+ * https://github.com/crvs/KDTree. It is a reimplementation of the above
+ * metioned versions, refactored and with methods added to support the
+ * following:
+ *  * insertion of single points
+ *  * getting the first neighbor of a point within range
  */
 
 #include <algorithm>
