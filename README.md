@@ -16,4 +16,6 @@ Adapted from [original](https://github.com/crvs/KDTree) and improved.
 
 © J. Frederico Carvalho (2018 - 2021)
 Licensed under the [BSD3 License](ORIGINAL_LICENSE)
+
 © G. Stoica and S. Amihaiesei (2022 - )
+Licensed under the [GPL3 License](LICENSE)
