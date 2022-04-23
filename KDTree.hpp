@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <vector>
 
 using point_t = std::vector<double>;
@@ -24,7 +25,7 @@ class KDNode
 {
   public:
     // why not unique pointers
-    using KDNodePtr = std::shared_ptr<KDNode>;
+    using KDNodePtr = std::unique_ptr<KDNode>;
     // const??
     point_t x;
     size_t index;
@@ -32,31 +33,31 @@ class KDNode
     KDNodePtr right;
 
     // initializer
-    KDNode() = default;
-    KDNode(const point_t&, size_t, const KDNodePtr&, const KDNodePtr&);
-    KDNode(const pointIndex&, const KDNodePtr&, const KDNodePtr&);
+    KDNode() = delete;
+    KDNode(const point_t&, size_t, KDNodePtr&&, KDNodePtr&&);
+    KDNode(const pointIndex&, KDNodePtr&&, KDNodePtr&&);
 
     // getter
     double coord(size_t);
 
     // conversions
-    explicit operator bool();
-    explicit operator point_t();
-    explicit operator size_t();
-    explicit operator pointIndex();
+    explicit operator bool() const;
+    explicit operator point_t() const;
+    explicit operator size_t() const;
+    explicit operator pointIndex() const;
 };
 
-using KDNodePtr = std::shared_ptr<KDNode>;
+using KDNodePtr = std::unique_ptr<KDNode>;
 
 KDNodePtr NewKDNodePtr();
 
 // square euclidean distance
 inline double dist2(const point_t&, const point_t&);
-inline double dist2(const KDNodePtr&, const KDNodePtr&);
+inline double dist2(const KDNode*, const KDNode*);
 
 // euclidean distance
 inline double dist(const point_t&, const point_t&);
-inline double dist(const KDNodePtr&, const KDNodePtr&);
+inline double dist(const KDNode*, const KDNode*);
 
 // Need for sorting
 class comparer
@@ -90,11 +91,11 @@ class KDTree
     explicit KDTree(const pointVec& point_array);
 
   private:
-    KDNodePtr nearest_(const KDNodePtr& branch, const point_t& pt, size_t level,
-                       const KDNodePtr& best, double best_dist);
+    const KDNode* nearest_(const KDNode* branch, const point_t& pt,
+                           size_t level, const KDNode* best, double best_dist);
 
     // default caller
-    KDNodePtr nearest_(const point_t& pt);
+    const KDNode* nearest_(const point_t& pt);
 
   public:
     void insert_point(const point_t& pt);
@@ -103,8 +104,11 @@ class KDTree
     pointIndex nearest_pointIndex(const point_t& pt);
 
   private:
-    pointIndexArr neighborhood_(const KDNodePtr& branch, const point_t& pt,
+    pointIndexArr neighborhood_(const KDNode* branch, const point_t& pt,
                                 double rad, size_t level);
+    std::optional<std::size_t>
+    firstNeighbor_(const KDNode* branch, const point_t& pt, double rad,
+                   size_t level) const;
 
   public:
     pointIndexArr neighborhood(const point_t& pt, double rad);
@@ -112,4 +116,7 @@ class KDTree
     pointVec neighborhood_points(const point_t& pt, double rad);
 
     indexArr neighborhood_indices(const point_t& pt, double rad);
+
+    std::optional<std::size_t>
+    firstNeighbor(const point_t& pt, double rad) const;
 };

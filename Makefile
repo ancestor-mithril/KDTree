@@ -30,7 +30,7 @@ toy: compile
 	&& ${COMPILER} ${FLAGS} ${RELEASE} KDTree.o toy_test.o -o toy_test.exe
 	./build/toy_test.exe
 
-time:
+time: compile
 	cd ${BUILDDIR} \
 	&& ${COMPILER} ${FLAGS} ${RELEASE} -c ../tests/construction_time.cpp \
 	&& ${COMPILER} ${FLAGS} ${RELEASE} KDTree.o construction_time.o -o construction_time.exe

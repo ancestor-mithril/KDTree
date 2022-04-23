@@ -8,7 +8,8 @@
 
 // point_t pt(2);
 
-int main() {
+int main()
+{
     pointVec points;
     point_t pt;
 
