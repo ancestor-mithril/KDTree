@@ -28,22 +28,14 @@ class KDNode
     using KDNodePtr = std::unique_ptr<KDNode>;
 
   public:
-    const point_t x;
     const std::size_t index;
     KDNodePtr left;
     KDNodePtr right;
 
     // initializer
     KDNode() = delete;
-    KDNode(const point_t&, std::size_t, KDNodePtr&&, KDNodePtr&&);
-    KDNode(const pointIndex&, KDNodePtr&&, KDNodePtr&&);
+    KDNode(std::size_t, KDNodePtr&&, KDNodePtr&&);
 
-    // getter
-    double coord(std::size_t) const;
-    const point_t& getPoint() const;
-
-    // conversions
-    explicit operator bool() const;
     explicit operator std::size_t() const;
 };
 
@@ -61,6 +53,8 @@ class KDTree
   public:
     KDTree() = default;
     explicit KDTree(const pointVec& point_array);
+
+    void reserve(std::size_t size);
 
     void insertPoint(const point_t& pt);
     void unsafeInsertPoint(const point_t& pt);
@@ -99,6 +93,11 @@ class KDTree
     firstNeighbor_(const KDNode* branch, const point_t& pt, double rad,
                    std::size_t level) const;
 
+    double coord(std::size_t, std::size_t) const;
+    double coord(const KDNode*, std::size_t) const;
+    const point_t& point(const KDNode*) const;
+
     std::size_t array_size = 0;
     KDNodePtr root;
+    pointVec points;
 };

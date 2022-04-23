@@ -51,15 +51,21 @@ int main()
     auto timespan = std::chrono::duration<double>(stop - start);
     std::cout << "it took " << timespan.count() << " seconds." << std::endl;
 
-    start = std::chrono::high_resolution_clock::now();
-    for (const auto& point : points2) {
-        tree.insertPoint(point);
-    }
+    {
+        // TODO: Now it doesn't work to insert intro a KDtree constructed with a vector of points and not inserted
+        KDTree tree;
 
-    stop = std::chrono::high_resolution_clock::now();
-    timespan = std::chrono::duration<double>(stop - start);
-    std::cout << "Inserting took " << timespan.count() << " seconds."
-              << std::endl;
+        start = std::chrono::high_resolution_clock::now();
+        for (const auto& point : points2) {
+            tree.insertPoint(point);
+        }
+
+        stop = std::chrono::high_resolution_clock::now();
+        timespan = std::chrono::duration<double>(stop - start);
+        std::cout << "Inserting took " << timespan.count() << " seconds."
+                << std::endl;
+    }
+    
 
     const auto points3 = getListofGeneratedVectors(npoints);
 
@@ -94,6 +100,7 @@ int main()
         timespan = std::chrono::duration<double>(stop - start);
         std::cout << "Searching with nearest within unbalanced took "
                   << timespan.count() << " seconds." << std::endl;
+        // return 0;
     }
 
     {
