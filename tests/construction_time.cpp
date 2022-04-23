@@ -87,7 +87,7 @@ int main()
 
         start = std::chrono::high_resolution_clock::now();
         for (const auto& point : points3) {
-            auto nearest = tree.nearestIndex(point);
+            auto nearest = tree.nearestIndexAndValue(point);
         }
 
         stop = std::chrono::high_resolution_clock::now();

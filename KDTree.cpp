@@ -40,19 +40,19 @@ double dist2(const point_t& a, const point_t& b)
 class comparer
 {
   public:
-    const size_t idx;
+    const std::size_t idx;
     comparer() = delete;
-    comparer(size_t index) : idx{index} {};
+    comparer(std::size_t index) : idx{index} {};
 
-    bool operator()(const std::pair<std::vector<double>, size_t>& a,
-                    const std::pair<std::vector<double>, size_t>& b)
+    bool operator()(const std::pair<std::vector<double>, std::size_t>& a,
+                    const std::pair<std::vector<double>, std::size_t>& b)
     {
         return a.first[idx] < b.first[idx];
     }
 };
 
 void sort_on_idx(pointIndexArr::iterator begin, pointIndexArr::iterator end,
-                 size_t idx)
+                 std::size_t idx)
 {
     std::nth_element(begin, begin + std::distance(begin, end) / 2, end,
                      comparer{idx});
@@ -63,7 +63,7 @@ KDNodePtr newKDNodePtr()
     return std::unique_ptr<KDNode>(nullptr);
 }
 
-KDNodePtr newKDNodePtr(const point_t& x, size_t idx)
+KDNodePtr newKDNodePtr(const point_t& x, std::size_t idx)
 {
     return std::make_unique<KDNode>(x, idx, newKDNodePtr(), newKDNodePtr());
 }
@@ -82,7 +82,7 @@ KDNode::KDNode(const pointIndex& pi, KDNodePtr&& left_, KDNodePtr&& right_)
 {
 }
 
-double KDNode::coord(size_t idx) const
+double KDNode::coord(std::size_t idx) const
 {
     return x[idx];
 }
@@ -92,7 +92,7 @@ KDNode::operator bool() const
     return (!x.empty());
 }
 
-KDNode::operator size_t() const
+KDNode::operator std::size_t() const
 {
     return index;
 }
@@ -104,7 +104,7 @@ const point_t& KDNode::getPoint() const
 
 KDNodePtr
 KDTree::makeTree(pointIndexArr::iterator begin, pointIndexArr::iterator end,
-                 size_t length, size_t level)
+                 std::size_t length, std::size_t level)
 {
     if (begin == end) {
         return newKDNodePtr(); // empty tree
@@ -159,12 +159,12 @@ KDTree::KDTree(const pointVec& point_array) : array_size(point_array.size())
     // begin, end, length, starting level
 }
 
-const KDNode*
-KDTree::nearest_(const KDNode* branch, const point_t& pt, size_t level,
+std::pair<const KDNode*, double>
+KDTree::nearest_(const KDNode* branch, const point_t& pt, std::size_t level,
                  const KDNode* best, double best_dist) const
 {
     if (not branch) {
-        return nullptr; // basically, null
+        return {nullptr, best_dist}; // basically, null
     }
 
     const auto& branch_pt = branch->getPoint();
@@ -193,11 +193,11 @@ KDTree::nearest_(const KDNode* branch, const point_t& pt, size_t level,
     const auto next_lv = (level + 1) % dim;
 
     // keep nearest neighbor from further down the tree
-    const auto further = nearest_(section, pt, next_lv, best_l, best_dist_l);
+    const auto [further, furtherBest] =
+        nearest_(section, pt, next_lv, best_l, best_dist_l);
     if (further) {
-        const auto dl = dist2(further->x, pt);
-        if (dl < best_dist_l) {
-            best_dist_l = dl;
+        if (furtherBest < best_dist_l) {
+            best_dist_l = furtherBest;
             best_l = further;
         }
     }
@@ -206,21 +206,21 @@ KDTree::nearest_(const KDNode* branch, const point_t& pt, size_t level,
 
     // only check the other branch if it makes sense to do so
     if (dx2 < best_dist_l) {
-        const auto further = nearest_(other, pt, next_lv, best_l, best_dist_l);
+        const auto [further, furtherBest] =
+            nearest_(other, pt, next_lv, best_l, best_dist_l);
         if (further) {
-            const auto dl = dist2(further->x, pt);
-            if (dl < best_dist_l) {
-                best_dist_l = dl;
+            if (furtherBest < best_dist_l) {
+                best_dist_l = furtherBest;
                 best_l = further;
             }
         }
     }
 
-    return best_l;
+    return {best_l, best_dist_l};
 };
 
 // default caller
-const KDNode* KDTree::nearest_(const point_t& pt) const
+std::pair<const KDNode*, double> KDTree::nearest_(const point_t& pt) const
 {
     if (not root) {
         throw std::logic_error("tree is empty");
@@ -273,24 +273,34 @@ void KDTree::insertPoint(const point_t& pt)
     unsafeInsertPoint(pt);
 }
 
-const point_t& KDTree::nearestPoint(const point_t& pt) const
+std::pair<std::size_t, double>
+KDTree::nearestIndexAndValue(const point_t& pt) const
 {
-    return nearest_(pt)->getPoint();
+    const auto [node, dist] = nearest_(pt);
+    // if root exists, then node is not null
+    // if root does not exist, then error is thrown
+    // we don't have to check for nullptr
+    return {node->index, dist};
 }
 
-size_t KDTree::nearestIndex(const point_t& pt) const
+const point_t& KDTree::nearestPoint(const point_t& pt) const
 {
-    return size_t(*nearest_(pt));
+    return nearest_(pt).first->getPoint();
+}
+
+std::size_t KDTree::nearestIndex(const point_t& pt) const
+{
+    return std::size_t(*nearest_(pt).first);
 }
 
 pointIndex KDTree::nearestPointIndex(const point_t& pt) const
 {
-    const auto* Nearest = nearest_(pt);
-    return pointIndex(Nearest->getPoint(), size_t(*Nearest));
+    const auto [Nearest, _] = nearest_(pt);
+    return pointIndex(Nearest->getPoint(), std::size_t(*Nearest));
 }
 
 indexArr KDTree::neighborhood_(const KDNode* branch, const point_t& pt,
-                               double rad, size_t level) const
+                               double rad, std::size_t level) const
 {
     if (not branch) {
         // check against empty branch ( nullptr or default constructed unique
@@ -304,7 +314,7 @@ indexArr KDTree::neighborhood_(const KDNode* branch, const point_t& pt,
     indexArr nbh;
 
     if (d <= r2) {
-        nbh.push_back(size_t(*branch));
+        nbh.push_back(std::size_t(*branch));
     }
 
     const auto dx = branch->coord(level) - pt[level];
@@ -347,7 +357,7 @@ KDTree::firstNeighbor(const point_t& pt, double rad) const
 
 std::optional<std::size_t>
 KDTree::firstNeighbor_(const KDNode* branch, const point_t& pt, double rad,
-                       size_t level) const
+                       std::size_t level) const
 {
     if (not branch) {
         // check against empty branch ( nullptr or default constructed unique
