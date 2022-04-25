@@ -384,7 +384,11 @@ KDTree::firstNeighbor_(const KDNode* branch, const point_t& pt, double rad,
     const auto dim = pt.size();
     const auto index = firstNeighbor_(section, pt, rad, (level + 1) % dim);
 
-    if (not index and dx * dx < r2) {
+    if (index) {
+        return index;
+    }
+
+    if (dx * dx < r2) {
         return firstNeighbor_(other, pt, rad, (level + 1) % dim);
     }
 
