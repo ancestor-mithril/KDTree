@@ -119,7 +119,7 @@ KDTree::makeTree(pointIndexArr::iterator begin, pointIndexArr::iterator end,
     const auto middle = begin + (length / 2);
     const auto l_len = length / 2;
 
-    auto left = [=, this]() {
+    auto left = [&]() {
         const auto l_begin = begin;
         const auto l_end = middle;
 
@@ -129,7 +129,7 @@ KDTree::makeTree(pointIndexArr::iterator begin, pointIndexArr::iterator end,
         return newKDNodePtr();
     }();
 
-    auto right = [=, this]() {
+    auto right = [&]() {
         const auto r_begin = middle + 1;
         const auto r_end = end;
         const auto r_len = length - l_len - 1;
