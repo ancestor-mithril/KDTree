@@ -10,7 +10,8 @@ Adapted from [original](https://github.com/crvs/KDTree) and improved.
 - it provides the following queries:
 	- nearest neighbor
 	- neighbors within a given distance
-    - first neighbor within a given distance
+	- first neighbor within a given distance
+	- ~~nearest neighbor within a given distance~~
 
 ## License and copyright
 
