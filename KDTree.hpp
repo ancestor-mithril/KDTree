@@ -65,6 +65,9 @@ class KDTree
     nearestIndexAndValue(const point_t& pt) const;
     pointIndex nearestPointIndex(const point_t& pt) const;
 
+    std::optional<std::size_t>
+    nearestIndexWithinRange(const point_t& pt, double range) const;
+
     indexArr neighborhood(const point_t& pt, double rad) const;
 
     [[deprecated("Use KDTree::neighborhoodIndices")]] pointVec
@@ -76,12 +79,12 @@ class KDTree
 
   private:
     KDNodePtr
-    makeTree(pointVec::iterator begin, pointVec::iterator end, std::size_t beginIndex,
-             std::size_t length, std::size_t level);
+    makeTree(pointVec::iterator begin, pointVec::iterator end,
+             std::size_t beginIndex, std::size_t length, std::size_t level);
 
     std::pair<const KDNode*, double>
     nearest_(const KDNode* branch, const point_t& pt, std::size_t level,
-             const KDNode* best, double best_dist) const;
+             const KDNode* best, double best_dist, double rad) const;
 
     std::pair<const KDNode*, double> nearest_(const point_t& pt) const;
 

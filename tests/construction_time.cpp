@@ -117,6 +117,15 @@ int main()
         timespan = std::chrono::duration<double>(stop - start);
         std::cout << "First Neighbor within balanced " << epsilon << " took "
                   << timespan.count() << " seconds." << std::endl;
+
+        start = std::chrono::high_resolution_clock::now();
+        for (const auto& point : points3) {
+            auto nearest = tree.nearestIndexWithinRange(point, epsilon);
+        }
+        stop = std::chrono::high_resolution_clock::now();
+        timespan = std::chrono::duration<double>(stop - start);
+        std::cout << "Nearest index within range within balanced " << epsilon
+                  << " took " << timespan.count() << " seconds." << std::endl;
     }
 
     {
@@ -143,6 +152,15 @@ int main()
         timespan = std::chrono::duration<double>(stop - start);
         std::cout << "First Neighbor within unbalanced " << epsilon << " took "
                   << timespan.count() << " seconds." << std::endl;
+
+        start = std::chrono::high_resolution_clock::now();
+        for (const auto& point : points3) {
+            auto nearest = tree.nearestIndexWithinRange(point, epsilon);
+        }
+        stop = std::chrono::high_resolution_clock::now();
+        timespan = std::chrono::duration<double>(stop - start);
+        std::cout << "Nearest index within range within unbalanced " << epsilon
+                  << " took " << timespan.count() << " seconds." << std::endl;
     }
 
     {
@@ -169,6 +187,15 @@ int main()
         timespan = std::chrono::duration<double>(stop - start);
         std::cout << "First Neighbor within unbalanced " << epsilon << " took "
                   << timespan.count() << " seconds." << std::endl;
+
+        start = std::chrono::high_resolution_clock::now();
+        for (const auto& point : points3) {
+            auto nearest = tree.nearestIndexWithinRange(point, epsilon);
+        }
+        stop = std::chrono::high_resolution_clock::now();
+        timespan = std::chrono::duration<double>(stop - start);
+        std::cout << "Nearest index within range within unbalanced " << epsilon
+                  << " took " << timespan.count() << " seconds." << std::endl;
     }
 
     return 0;

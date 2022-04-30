@@ -41,8 +41,8 @@ class comparer
     comparer() = delete;
     comparer(std::size_t index) : idx{index} {};
 
-    bool operator()(const std::vector<double>& a,
-                    const std::vector<double>& b) const
+    bool
+    operator()(const std::vector<double>& a, const std::vector<double>& b) const
     {
         return a[idx] < b[idx];
     }
@@ -95,8 +95,8 @@ const point_t& KDNode::getPoint() const
 }
 
 KDNodePtr
-KDTree::makeTree(pointVec::iterator begin, pointVec::iterator end, std::size_t beginIndex,
-                 std::size_t length, std::size_t level)
+KDTree::makeTree(pointVec::iterator begin, pointVec::iterator end,
+                 std::size_t beginIndex, std::size_t length, std::size_t level)
 {
     if (begin == end) {
         return newKDNodePtr();
@@ -115,7 +115,8 @@ KDTree::makeTree(pointVec::iterator begin, pointVec::iterator end, std::size_t b
         const auto l_end = middle;
 
         if (l_len > 0 and dim > 0) {
-            return makeTree(l_begin, l_end, beginIndex, l_len, (level + 1) % dim);
+            return makeTree(l_begin, l_end, beginIndex, l_len,
+                            (level + 1) % dim);
         }
         return newKDNodePtr();
     }();
@@ -126,20 +127,23 @@ KDTree::makeTree(pointVec::iterator begin, pointVec::iterator end, std::size_t b
         const auto r_len = length - l_len - 1;
 
         if (r_len > 0 && dim > 0) {
-            return makeTree(r_begin, r_end, middleIndex + 1, r_len, (level + 1) % dim);
+            return makeTree(r_begin, r_end, middleIndex + 1, r_len,
+                            (level + 1) % dim);
         }
         return newKDNodePtr();
     }();
 
-    return std::make_unique<KDNode>(*middle, middleIndex, std::move(left), std::move(right));
+    return std::make_unique<KDNode>(*middle, middleIndex, std::move(left),
+                                    std::move(right));
 }
 
 KDTree::KDTree(std::size_t dimensions)
-    : dim{dimensions}, array_size{0}, root{newKDNodePtr()} 
+    : dim{dimensions}, array_size{0}, root{newKDNodePtr()}
 {
 }
 
-KDTree::KDTree(const pointVec& point_array, std::size_t dimensions) : dim{dimensions}, array_size{point_array.size()} 
+KDTree::KDTree(const pointVec& point_array, std::size_t dimensions)
+    : dim{dimensions}, array_size{point_array.size()}
 {
     rebuild(point_array);
 }
@@ -147,28 +151,26 @@ KDTree::KDTree(const pointVec& point_array, std::size_t dimensions) : dim{dimens
 void KDTree::rebuild(const pointVec& point_array)
 {
     auto pointArray = point_array; // copy because we need to sort it
-    root = makeTree(pointArray.begin(), pointArray.end(), 0, pointArray.size(), level0);
+    root = makeTree(pointArray.begin(), pointArray.end(), 0, pointArray.size(),
+                    level0);
     // begin, end, length, starting level
 }
 
 std::pair<const KDNode*, double>
 KDTree::nearest_(const KDNode* branch, const point_t& pt, std::size_t level,
-                 const KDNode* best, double best_dist) const
+                 const KDNode* best, double best_dist, double rad) const
 {
     if (not branch) {
         return {nullptr, best_dist};
     }
 
+    const auto r2 = std::min(rad * rad, best_dist);
     const auto& branch_pt = branch->getPoint();
-
     const auto d = dist2(branch_pt, pt);
 
-    auto best_l = best;
-    auto best_dist_l = best_dist;
-
-    if (d < best_dist) {
-        best_dist_l = d;
-        best_l = branch;
+    if (d < r2) {
+        best_dist = d;
+        best = branch;
     }
 
     const auto dx = branch_pt[level] - pt[level];
@@ -182,32 +184,29 @@ KDTree::nearest_(const KDNode* branch, const point_t& pt, std::size_t level,
     }();
 
     const auto next_lv = (level + 1) % dim;
-
     // keep nearest neighbor from further down the tree
     const auto [further, furtherBest] =
-        nearest_(section, pt, next_lv, best_l, best_dist_l);
-    if (further) {
-        if (furtherBest < best_dist_l) {
-            best_dist_l = furtherBest;
-            best_l = further;
-        }
+        nearest_(section, pt, next_lv, best, best_dist, rad);
+    if (further and furtherBest < r2) {
+        best_dist = furtherBest;
+        best = further;
     }
 
     const auto dx2 = dx * dx;
-
     // only check the other branch if it makes sense to do so
-    if (dx2 < best_dist_l) {
+    if (dx2 < r2) {
         const auto [further, furtherBest] =
-            nearest_(other, pt, next_lv, best_l, best_dist_l);
-        if (further) {
-            if (furtherBest < best_dist_l) {
-                best_dist_l = furtherBest;
-                best_l = further;
-            }
+            nearest_(other, pt, next_lv, best, best_dist, rad);
+        if (further and furtherBest < r2) {
+            best_dist = furtherBest;
+            best = further;
         }
     }
 
-    return {best_l, best_dist_l};
+    if (best_dist < r2) {
+        return {best, best_dist};
+    }
+    return {nullptr, best_dist};
 };
 
 // default caller
@@ -217,11 +216,15 @@ std::pair<const KDNode*, double> KDTree::nearest_(const point_t& pt) const
         throw std::logic_error("tree is empty");
     }
 
-    return nearest_(root.get(),                // beginning of tree
-                    pt,                        // point we are querying
-                    level0,                    // start from level 0
-                    root.get(),                // best is the root
-                    dist2(root.get()->x, pt)); // branch_dist
+    const auto dist = dist2(root.get()->x, pt);
+
+    return nearest_(root.get(),       // beginning of tree
+                    pt,               // point we are querying
+                    level0,           // start from level 0
+                    root.get(),       // best is the root
+                    dist,             // branch_dist
+                    std::sqrt(dist)); // radius
+    // radius must be sqrt(worst possible distance)
 };
 
 void KDTree::unsafeInsertPoint(const point_t& pt)
@@ -282,6 +285,25 @@ std::size_t KDTree::nearestIndex(const point_t& pt) const
     return std::size_t(*nearest_(pt).first);
 }
 
+std::optional<std::size_t>
+KDTree::nearestIndexWithinRange(const point_t& pt, double range) const
+{
+    if (not root) {
+        throw std::logic_error("tree is empty");
+    }
+
+    const auto [node, dist] = nearest_(root.get(), // beginning of tree
+                                       pt,         // point we are querying
+                                       level0,     // start from level 0
+                                       root.get(), // best is the root
+                                       dist2(root.get()->x, pt), // branch_dist
+                                       range);                   // radius
+    if (node) {
+        return node->index;
+    }
+    return std::nullopt;
+}
+
 pointIndex KDTree::nearestPointIndex(const point_t& pt) const
 {
     const auto [Nearest, _] = nearest_(pt);
@@ -312,12 +334,13 @@ indexArr KDTree::neighborhood_(const KDNode* branch, const point_t& pt,
         return std::make_pair(branch->right.get(), branch->left.get());
     }();
 
-    const auto nbh_s = neighborhood_(section, pt, rad, (level + 1) % dim);
+    const auto next_lv = (level + 1) % dim;
+    const auto nbh_s = neighborhood_(section, pt, rad, next_lv);
     nbh.insert(nbh.end(), nbh_s.begin(), nbh_s.end());
 
     const auto dx2 = dx * dx;
     if (dx2 < r2) {
-        const auto nbh_o = neighborhood_(other, pt, rad, (level + 1) % dim);
+        const auto nbh_o = neighborhood_(other, pt, rad, next_lv);
         nbh.insert(nbh.end(), nbh_o.begin(), nbh_o.end());
     }
 
