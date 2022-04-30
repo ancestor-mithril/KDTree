@@ -141,8 +141,13 @@ KDTree::KDTree(std::size_t dimensions)
 
 KDTree::KDTree(const pointVec& point_array, std::size_t dimensions) : dim{dimensions}, array_size{point_array.size()} 
 {
+    rebuild(point_array);
+}
+
+void KDTree::rebuild(const pointVec& point_array)
+{
     auto pointArray = point_array; // copy because we need to sort it
-    root = KDTree::makeTree(pointArray.begin(), pointArray.end(), 0, pointArray.size(), level0);
+    root = makeTree(pointArray.begin(), pointArray.end(), 0, pointArray.size(), level0);
     // begin, end, length, starting level
 }
 

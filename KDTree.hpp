@@ -51,11 +51,14 @@ class KDTree
 {
   public:
     KDTree() = delete;
-    KDTree(std::size_t dimensions);
+    explicit KDTree(std::size_t dimensions);
     explicit KDTree(const pointVec& point_array, std::size_t dimensions);
+
+    void rebuild(const pointVec& point_array);
 
     void insertPoint(const point_t& pt);
     void unsafeInsertPoint(const point_t& pt);
+
     point_t nearestPoint(const point_t& pt) const;
     std::size_t nearestIndex(const point_t& pt) const;
     std::pair<std::size_t, double>
