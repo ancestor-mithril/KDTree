@@ -24,7 +24,7 @@ int main()
     pt = {0.5, 0.5};
     points.push_back(pt);
 
-    KDTree tree(points);
+    KDTree tree(points, points.size());
 
     std::cout << "nearest test\n";
     pt = {0.8, 0.2};

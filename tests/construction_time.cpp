@@ -46,7 +46,7 @@ int main()
     const auto points2 = getListofGeneratedVectors(npoints);
 
     auto start = std::chrono::high_resolution_clock::now();
-    KDTree tree(points);
+    KDTree tree(points, points[0].size());
     auto stop = std::chrono::high_resolution_clock::now();
     auto timespan = std::chrono::duration<double>(stop - start);
     std::cout << "it took " << timespan.count() << " seconds." << std::endl;
@@ -66,7 +66,7 @@ int main()
     const auto repeat = npoints;
 
     {
-        KDTree tree(points);
+        KDTree tree(points, points[0].size());
         start = std::chrono::high_resolution_clock::now();
 
         for (const auto& point : points3) {
@@ -80,7 +80,7 @@ int main()
     }
 
     {
-        KDTree tree;
+        KDTree tree(points2[0].size());
         for (const auto& point : points2) {
             tree.insertPoint(point);
         }
@@ -97,7 +97,7 @@ int main()
     }
 
     {
-        KDTree tree(points);
+        KDTree tree(points, points[0].size());
 
         start = std::chrono::high_resolution_clock::now();
         const auto epsilon = 0.01;
@@ -120,7 +120,7 @@ int main()
     }
 
     {
-        KDTree tree;
+        KDTree tree{points2[0].size()};
         for (const auto& point : points2) {
             tree.insertPoint(point);
         }
@@ -146,7 +146,7 @@ int main()
     }
 
     {
-        KDTree tree;
+        KDTree tree{points2[0].size()};
         for (const auto& point : points2) {
             tree.insertPoint(point);
         }

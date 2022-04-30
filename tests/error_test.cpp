@@ -66,7 +66,7 @@ int main()
             points = getListofGeneratedVectors(sizes);
 
             // genereate KD Tree
-            KDTree tree;
+            KDTree tree{DIM};
 
             for (const auto& point : points) {
                 tree.insertPoint(point);

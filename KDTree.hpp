@@ -33,38 +33,30 @@ class KDNode
     KDNodePtr left;
     KDNodePtr right;
 
-    // initializer
     KDNode() = delete;
     KDNode(const point_t&, std::size_t, KDNodePtr&&, KDNodePtr&&);
     KDNode(const pointIndex&, KDNodePtr&&, KDNodePtr&&);
 
-    // getter
     double coord(std::size_t) const;
     const point_t& getPoint() const;
 
-    // conversions
-    explicit operator bool() const;
     explicit operator std::size_t() const;
 };
 
 using KDNodePtr = std::unique_ptr<KDNode>;
-
-KDNodePtr nullKDNodePtr();
-
-using pointIndexArr = typename std::vector<pointIndex>;
-
+using pointIndexArr = std::vector<pointIndex>;
 using pointVec = std::vector<point_t>;
 
 class KDTree
 {
-
   public:
-    KDTree() = default;
-    explicit KDTree(const pointVec& point_array);
+    KDTree() = delete;
+    KDTree(std::size_t dimensions);
+    explicit KDTree(const pointVec& point_array, std::size_t dimensions);
 
     void insertPoint(const point_t& pt);
     void unsafeInsertPoint(const point_t& pt);
-    const point_t& nearestPoint(const point_t& pt) const;
+    point_t nearestPoint(const point_t& pt) const;
     std::size_t nearestIndex(const point_t& pt) const;
     std::pair<std::size_t, double>
     nearestIndexAndValue(const point_t& pt) const;
@@ -72,9 +64,8 @@ class KDTree
 
     indexArr neighborhood(const point_t& pt, double rad) const;
 
-    // TODO: Move vector of points here
-    // add neighbor points
-
+    [[deprecated("Use KDTree::neighborhoodIndices")]] pointVec
+    neighborhoodPoints(const point_t& pt, double rad) const;
     indexArr neighborhoodIndices(const point_t& pt, double rad) const;
 
     std::optional<std::size_t>
@@ -82,23 +73,27 @@ class KDTree
 
   private:
     KDNodePtr
-    makeTree(pointIndexArr::iterator begin, pointIndexArr::iterator end,
+    makeTree(pointVec::iterator begin, pointVec::iterator end, std::size_t beginIndex,
              std::size_t length, std::size_t level);
 
     std::pair<const KDNode*, double>
     nearest_(const KDNode* branch, const point_t& pt, std::size_t level,
              const KDNode* best, double best_dist) const;
 
-    // default caller
     std::pair<const KDNode*, double> nearest_(const point_t& pt) const;
 
     indexArr neighborhood_(const KDNode* branch, const point_t& pt, double rad,
                            std::size_t level) const;
 
+    [[deprecated]] pointVec
+    neighborhoodPoints_(const KDNode* branch, const point_t& pt, double rad,
+                        std::size_t level) const;
+
     std::optional<std::size_t>
     firstNeighbor_(const KDNode* branch, const point_t& pt, double rad,
                    std::size_t level) const;
 
+    const std::size_t dim = 0;
     std::size_t array_size = 0;
     KDNodePtr root;
 };
